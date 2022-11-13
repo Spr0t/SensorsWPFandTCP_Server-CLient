@@ -1,0 +1,29 @@
+{
+  "Sensors": [
+    {
+        "ID": 1,
+        "Type": 1,
+        "MinValue": -10,
+        "MaxValue": 100,
+        "EncoderType": "fixed",
+        "Frequency": 500,
+        "label": "SpeedSensor"
+    },
+    {
+        "ID": 2,
+        "Type": 2,
+        "MinValue": -10000,
+        "MaxValue": 10000,
+        "EncoderType": "fixed",
+        "Frequency": 1000
+    },
+    {
+        "ID": 3,
+        "Type": 3,
+        "MinValue": 0,
+        "MaxValue": 255,
+        "EncoderType": "fixed",
+        "Frequency": 100
+    }
+  ]
+}

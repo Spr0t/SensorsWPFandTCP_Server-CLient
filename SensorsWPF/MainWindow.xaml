@@ -1,0 +1,14 @@
+﻿<Window x:Class="SensorsWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SensorsWPF"
+        mc:Ignorable="d"
+        Title="Sensors" Height="400" Width="600">
+    <Grid x:Name="MainRoot">
+        <Label x:Name="SpeedSensor" HorizontalAlignment="Left"  Margin="30,40,0,0"  VerticalAlignment="Top" Height="75" Width="372" Loaded="SpeedSensor_Loaded" />
+        <Label x:Name="PositionSensor" HorizontalAlignment="Left"  Margin="30,140,0,0"  VerticalAlignment="Top" Height="74" Width="372" Loaded="PositionSensor_Loaded" />
+        <Label x:Name="DepthSensor" HorizontalAlignment="Left"  Margin="30,240,0,0"  VerticalAlignment="Top" Height="75" Width="372" Loaded="DepthSensor_Loaded" />
+    </Grid>
+</Window>
