@@ -58,6 +58,12 @@ dotnet_naming_style.pascal_case.word_separator =
 dotnet_naming_style.pascal_case.capitalization = pascal_case
 csharp_space_around_binary_operators = before_and_after
 
+# CS8601: Возможно, назначение-ссылка, допускающее значение NULL.
+dotnet_diagnostic.CS8601.severity = none
+
+# CS8602: Разыменование вероятной пустой ссылки.
+dotnet_diagnostic.CS8602.severity = none
+
 [*.vb]
 #### Стили именования ####
 

@@ -5,7 +5,7 @@ using System.Threading;
 using SensorsWPF.Entity;
 using System.Text;
 
-namespace SensorsWPF.Server
+namespace SensorsWPF.TCPLogic
 {
     public class ClientObject
     {

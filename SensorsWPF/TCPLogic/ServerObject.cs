@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace SensorsWPF.Server
+namespace SensorsWPF.TCPLogic
 {
     public class ServerObject
     {
@@ -60,7 +60,7 @@ namespace SensorsWPF.Server
         {
     
                 byte[] data = Encoding.UTF8.GetBytes(message);
-
+                
                 client.Stream.Write(data, 0, data.Length);
          
         }

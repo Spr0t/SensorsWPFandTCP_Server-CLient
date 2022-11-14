@@ -6,60 +6,50 @@ using System.Timers;
 using NLog;
 using System.Windows.Threading;
 using System.Reflection.Metadata;
-using SensorsWPF.Server;
 using System.Net.Sockets;
+using SensorsWPF.Logic;
 
 namespace SensorsWPF.Entity
 {
-    public class BaseSensor
+    public class BaseSensor 
     {
-        public int ID { get; set; }
-        public SensorType Type { get; set; }
-        public EncoderType EncoderType { get; set; }
-        public int Frequency { get; set; }
+        protected int ID { get; set; }
+        protected SensorType Type { get; set; }
+        protected EncoderType EncoderType { get; set; }
+        protected int Frequency { get; set; }
+        protected double MillisecondsDelay => 1000 / this.Frequency;
 
-        public virtual void Run()
-        {
-        }
+        protected int Value;
+        protected string Quality;
     }
 
-    public class Sensor : BaseSensor 
+    public class Sensor : BaseSensor
     {
-        private int MinValue { get; set; }
-        private int MaxValue { get; set; }
-        private int SensorValue { get; set; }
-        private int MillisecondsDelay => 1000 / Frequency;
-        private string QualityValue { get; set; }
-        public string SensorResult { get; set; }
         private Label Label { get; set; }
-        private Random _random;
+        
+        private Edges Edges;
+
+        private Random Random;
 
         public Sensor(int iD, SensorType type, int minValue, int maxValue, EncoderType encoderType, int frequency)
         {
             ID = iD;
             Type = type;
-            MinValue = minValue;
-            MaxValue = maxValue;
             EncoderType = encoderType;
             Frequency = frequency;
-            _random = new Random();
+            Edges = new Edges(minValue, maxValue);
+            Random = new Random();
         }
 
-
-        public Sensor()
+        internal void Start(Label label)
         {
-
+            Label = label;
+            SensorStart();
         }
 
-        public override void Run()
+        private void SensorStart()
         {
-            Label = this.AskFactoryForLabel();
-            SensorStart();          
-        }
-
-        public void SensorStart()
-        {
-            var timer = new Timer() { Interval = (double)MillisecondsDelay };
+            var timer = new Timer() { Interval = MillisecondsDelay };
             timer.Start();
             timer.Elapsed += async (o, e) =>
             {
@@ -70,49 +60,24 @@ namespace SensorsWPF.Entity
             };
         }
 
-        public void SensorBody()
+        private void SensorBody()
         {          
-            SensorValue = _random.Next(MinValue, MaxValue + 1);
-            QualityValue=  WarningOrAlarm();
+            Value = Random.Next(Edges.Bottom, Edges.Top + 1);
+            Quality = WarningOrAlarm();
+
             Label.Dispatcher.Invoke(DispatcherPriority.Normal, 
                 new Action(() => 
                 {
-                    SensorResult = $"$ FIX, {ID}, {Type}, {SensorValue}, {QualityValue} *";
-                    Label.Content = $"$ FIX, {ID}, {Type}, {SensorValue}, {QualityValue} *";
-
+                    Label.Content = $"$ FIX, {ID}, {Type}, {Value}, {Quality} *";
                 }));
-
-            if (ServerObject.client != null)
-            {
-                ServerObject.SendMessage(SensorResult, ServerObject.client);
-            }
-
-
-
         }
 
         private string WarningOrAlarm()
         {
-
-           var _bottomBottomEdge = (MaxValue - MinValue) * 0.10 + MinValue;
-           var _topTopEdge = (MaxValue - MinValue) * 0.90 + MinValue;
-
-           var _bottomTopEdge = (MaxValue - MinValue) * 0.25 + MinValue;
-           var _topBottomEdge = (MaxValue - MinValue) * 0.75 + MinValue;
-           
-
-
-
-            if(SensorValue > _topTopEdge || SensorValue < _bottomBottomEdge) { return "Alarm"; }
-            if(SensorValue > _topBottomEdge || SensorValue < _bottomTopEdge) { return "Warning"; }
+            if(Value > Edges.TopTopEdge || Value < Edges.BottomBottomEdge) { return "Alarm"; }
+            if(Value > Edges.TopBottomEdge || Value < Edges.BottomTopEdge) { return "Warning"; }
             return "Normal";
-
-        }
-
-
-
-
-
+        }  
     }
 }
 

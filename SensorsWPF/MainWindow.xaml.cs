@@ -1,19 +1,19 @@
-﻿using SensorsWPF.Server;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using SensorsWPF.Server;
+using SensorsWPF.Logic;
+using SensorsWPF.TCPLogic;
 
 namespace SensorsWPF
 {
-    
+
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
             InitializeSensors();
-            StartServer();
+            InitializeServer();
         }
 
 
@@ -21,38 +21,28 @@ namespace SensorsWPF
         {
             SensorFactory.CreateAllSensors(out int sensorsCount);
             
-
             for (var i = 0; i < sensorsCount; i++)
             {
-                RowDefinition newGridRow = new RowDefinition()
-                {
-                    Name = "GridRow" +i
-                };
-       
-                MainRoot.RowDefinitions.Add(newGridRow);
-
                 var newLabel = new Label()
                 {
-                    HorizontalContentAlignment = HorizontalAlignment.Left,
-                    VerticalContentAlignment = VerticalAlignment.Top,
-                    Name = "LabelNumber" + i,
+                    Name = "LabelNumber" + i,                
                     Width = 500,
                     Height = 50,
+                    Margin = new Thickness(10, 5, 0, 0),
+                    RenderTransform = new TranslateTransform(0, 30*i)
                 };
-                Grid.SetRow(newLabel, i);
-
                 MainRoot.Children.Add(newLabel);
+
                 SensorFactory.AppendLabel(newLabel);
             }
 
             SensorFactory.SyncSensorsAndLabels();
             SensorFactory.RunAllSensors();
-
         }
 
-        private void StartServer()
+        private void InitializeServer()
         {
-            Server.Server s = new Server.Server();
+            Server s = new Server();
             
 
 

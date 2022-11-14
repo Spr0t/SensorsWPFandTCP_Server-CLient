@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace SensorsWPF.Server
+namespace SensorsWPF.TCPLogic
 {
     public class Server
     {
