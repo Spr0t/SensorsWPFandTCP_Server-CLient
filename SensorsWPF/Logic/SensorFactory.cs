@@ -8,21 +8,26 @@ using System.Windows.Controls;
 using Microsoft.Extensions.Configuration;
 using NLog;
 using SensorsWPF.Entity;
+using SensorsWPF.TCPLogic;
 
 namespace SensorsWPF.Logic
 {
-    public class SensorAndLabel
+    public class SensorAndLabelAndClient
     {
         public Sensor Sensor { get; set; }
         public Label Label { get; set; }
+        public ClientObject Client { get; set; }
     }
 
     public static class SensorFactory
+        
     {
+        public static Logger logger = LogManager.GetCurrentClassLogger();
         private static SensorsSettings sensorsSettings;
         private static List<Sensor> _sensorsList;
         private static List<Label> _labelsList;
-        public static List<SensorAndLabel> _sensorsAndLabels;
+        private static List<ClientObject> _clientList;
+        public static List<SensorAndLabelAndClient> _sensorsAndLabelsAndClients;
 
         public static void CreateAllSensors(out int sensorsCount)
         {
@@ -46,13 +51,20 @@ namespace SensorsWPF.Logic
             _labelsList.Add(label);
         }
 
+        public static void AppendClient(ClientObject client)
+        {
+            _clientList ??= new List<ClientObject>();
+            _clientList.Add(client);
+            SyncSensorsAndClients();
+        }
+
         public static void SyncSensorsAndLabels()
         {
-            _sensorsAndLabels ??= new List<SensorAndLabel>();
+            _sensorsAndLabelsAndClients ??= new List<SensorAndLabelAndClient>();
 
             for (var i = 0; i < _sensorsList.Count; i++)
             {
-                _sensorsAndLabels.Add(new SensorAndLabel()
+                _sensorsAndLabelsAndClients.Add(new SensorAndLabelAndClient()
                 {
                     Sensor = _sensorsList[i],
                     Label = _labelsList[i]
@@ -60,11 +72,32 @@ namespace SensorsWPF.Logic
             }
         }
 
+        public static void SyncSensorsAndClients()
+        {
+            _sensorsAndLabelsAndClients = _sensorsAndLabelsAndClients ?? throw new Exception("List was not initialized");
+
+            /// TODO Refactoring make client wait for a free sensor
+            if (_clientList.Count > _sensorsList.Count)
+            {
+                throw new Exception("Too many clients");
+                logger.Info("Too many clients, Disconnected");
+            }
+
+            for (var i = 0; i < _clientList.Count; i++)
+            {
+                if (_sensorsAndLabelsAndClients[i].Client == null)
+                {
+                    _sensorsAndLabelsAndClients[i].Client = _clientList[i];
+                    _sensorsAndLabelsAndClients[i].Sensor.Client = _clientList[i];
+                }
+            }
+        }
+
         public static void RunAllSensors()
         {
-            for (var i = 0; i < _sensorsAndLabels.Count; i++)
+            for (var i = 0; i < _sensorsAndLabelsAndClients.Count; i++)
             {
-                _sensorsAndLabels[i].Sensor.Start(_sensorsAndLabels[i].Label);         
+                _sensorsAndLabelsAndClients[i].Sensor.Start(_sensorsAndLabelsAndClients[i].Label);         
             }
         }
 

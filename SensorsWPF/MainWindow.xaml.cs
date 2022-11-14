@@ -42,10 +42,7 @@ namespace SensorsWPF
 
         private void InitializeServer()
         {
-            Server s = new Server();
-            
-
-
+            Server.Start();
         }
 
     }

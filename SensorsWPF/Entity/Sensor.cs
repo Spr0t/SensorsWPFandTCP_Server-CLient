@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using System.Reflection.Metadata;
 using System.Net.Sockets;
 using SensorsWPF.Logic;
+using SensorsWPF.TCPLogic;
 
 namespace SensorsWPF.Entity
 {
@@ -17,7 +18,7 @@ namespace SensorsWPF.Entity
         protected SensorType Type { get; set; }
         protected EncoderType EncoderType { get; set; }
         protected int Frequency { get; set; }
-        protected double MillisecondsDelay => 1000 / this.Frequency;
+        protected double MillisecondsDelay => 1000 / Frequency;
 
         protected int Value;
         protected string Quality;
@@ -30,6 +31,8 @@ namespace SensorsWPF.Entity
         private Edges Edges;
 
         private Random Random;
+
+        public ClientObject Client;
 
         public Sensor(int iD, SensorType type, int minValue, int maxValue, EncoderType encoderType, int frequency)
         {
@@ -65,11 +68,17 @@ namespace SensorsWPF.Entity
             Value = Random.Next(Edges.Bottom, Edges.Top + 1);
             Quality = WarningOrAlarm();
 
+            var message = $"$ FIX, \t{ID}, \t{Type}, \t{Value}, \t{Quality} *";
             Label.Dispatcher.Invoke(DispatcherPriority.Normal, 
                 new Action(() => 
                 {
-                    Label.Content = $"$ FIX, {ID}, {Type}, {Value}, {Quality} *";
+                    Label.Content = message;
                 }));
+
+            if (Client != null)
+            {
+                ServerObject.SendMessage(message, Client);
+            }
         }
 
         private string WarningOrAlarm()

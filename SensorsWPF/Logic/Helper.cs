@@ -10,13 +10,9 @@ namespace SensorsWPF.Logic
 {
     public static class Helper
     {
-
         public static string FirstLetterToUpper(this string input)
         {
             return input.First().ToString().ToUpper() + String.Join("", input.Skip(1));
         }
-
-
-
     }
 }
